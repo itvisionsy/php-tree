@@ -16,7 +16,7 @@ use Exception;
 use IteratorAggregate;
 use JsonSerializable;
 
-class TreeNode implements ArrayAccess, IteratorAggregate, JsonSerializable, Countable
+class TreeNode implements ITreeNode, ArrayAccess, IteratorAggregate, JsonSerializable, Countable
 {
     /** @var TreeNode[] */
     protected $children = [];
@@ -84,11 +84,27 @@ class TreeNode implements ArrayAccess, IteratorAggregate, JsonSerializable, Coun
     }
 
     /**
-     * @param TreeNode $node
+     * @param ITreeNode|TreeNode $node
      */
-    public function addChild(TreeNode &$node)
+    public function addChild(ITreeNode &$node)
     {
         $this->children[] = $node;
+    }
+
+    /**
+     * @return TreeNode
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param ITreeNode|TreeNode $parent
+     */
+    public function setParent(ITreeNode &$parent)
+    {
+        $this->parent = $parent;
     }
 
     /**
@@ -203,22 +219,6 @@ class TreeNode implements ArrayAccess, IteratorAggregate, JsonSerializable, Coun
     public function count()
     {
         return count($this->getChildren());
-    }
-
-    /**
-     * @return TreeNode
-     */
-    public function getParent()
-    {
-        return $this->parent;
-    }
-
-    /**
-     * @param TreeNode $parent
-     */
-    public function setParent(TreeNode &$parent)
-    {
-        $this->parent = $parent;
     }
 
     public function getPath()

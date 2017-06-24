@@ -7,7 +7,6 @@
  */
 
 use ItvisionSy\Tree\Tree;
-use ItvisionSy\Tree\TreeNode;
 use PHPUnit\Framework\TestCase;
 
 class TreeTest extends TestCase
