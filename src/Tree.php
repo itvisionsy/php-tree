@@ -165,7 +165,7 @@ class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countabl
     /**
      * @return TreeNode[]
      */
-    public function getRoots(): array
+    public function getRoots()
     {
         return $this->roots;
     }
@@ -173,7 +173,7 @@ class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countabl
     /**
      * @return TreeNode[]
      */
-    public function getNodes(): array
+    public function getNodes()
     {
         return $this->nodes;
     }
