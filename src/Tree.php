@@ -34,7 +34,7 @@ class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countabl
      */
     public function insert($id, $data, $parentId = null)
     {
-        $node = new TreeNode($id, $data);
+        $node = static::makeNode($id, $data, $parentId);
         if ($parentId && !$this->offsetExists($parentId)) {
             throw new Exception("Parent node does not exist");
         } elseif ($parentId) {
@@ -176,6 +176,17 @@ class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countabl
     public function getNodes()
     {
         return $this->nodes;
+    }
+
+    /**
+     * @param $id
+     * @param $data
+     * @param TreeNode|null $parent
+     * @return TreeNode
+     */
+    protected static function makeNode($id, $data, TreeNode $parent = null)
+    {
+        return new TreeNode($id, $data, $parent);
     }
 
 }
