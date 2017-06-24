@@ -208,7 +208,7 @@ class TreeNode implements ArrayAccess, IteratorAggregate, JsonSerializable, Coun
     /**
      * @return TreeNode
      */
-    public function getParent(): TreeNode
+    public function getParent()
     {
         return $this->parent;
     }
