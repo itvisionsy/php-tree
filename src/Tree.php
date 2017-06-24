@@ -68,7 +68,7 @@ class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countabl
      */
     public function toArray()
     {
-        return array_map(function (TreeNode $node) {
+        return array_map(function (ITreeNode $node) {
             return $node->toArray();
         }, $this->roots);
     }
@@ -181,10 +181,10 @@ class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countabl
     /**
      * @param $id
      * @param $data
-     * @param TreeNode|null $parent
+     * @param ITreeNode|TreeNode|null $parent
      * @return TreeNode
      */
-    protected static function makeNode($id, $data, TreeNode $parent = null)
+    protected static function makeNode($id, $data, ITreeNode $parent = null)
     {
         return new TreeNode($id, $data, $parent);
     }
