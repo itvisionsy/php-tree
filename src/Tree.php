@@ -8,7 +8,14 @@
 
 namespace ItvisionSy\Tree;
 
-class Tree implements \IteratorAggregate, \JsonSerializable, \ArrayAccess
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
+use Exception;
+use IteratorAggregate;
+use JsonSerializable;
+
+class Tree implements IteratorAggregate, JsonSerializable, ArrayAccess, Countable
 {
 
     /** @var TreeNode[] */
@@ -17,14 +24,26 @@ class Tree implements \IteratorAggregate, \JsonSerializable, \ArrayAccess
     /** @var TreeNode[] */
     protected $nodes = [];
 
-    public function insert(TreeNode $node, $parentId = null)
+    /**
+     * @param $id
+     * @param $data
+     * @param null $parentId
+     * @return $this
+     * @throws Exception
+     * @internal param TreeNode $node
+     */
+    public function insert($id, $data, $parentId = null)
     {
-        if (!$parentId) {
-            $this->roots[] = $node;
-        } elseif (!array_key_exists($parentId, $this->nodes)) {
-            throw new \Exception("Parent node does not exist");
+        $node = new TreeNode($id, $data);
+        if ($parentId && !$this->offsetExists($parentId)) {
+            throw new Exception("Parent node does not exist");
+        } elseif ($parentId) {
+            $parentNode = $this->offsetGet($parentId);
+            $node->setParent($parentNode);
+            $parentNode->addChild($node);
         } else {
-            $this->nodes[$parentId]->addChild($node);
+            $parentNode = null;
+            $this->roots[] = $node;
         }
         $this->nodes[$node->getId()] = $node;
         return $this;
@@ -39,7 +58,7 @@ class Tree implements \IteratorAggregate, \JsonSerializable, \ArrayAccess
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->roots);
+        return new ArrayIterator($this->roots);
     }
 
     /**
@@ -77,7 +96,7 @@ class Tree implements \IteratorAggregate, \JsonSerializable, \ArrayAccess
      * @param mixed $offset <p>
      * The offset to retrieve.
      * </p>
-     * @return mixed Can return all value types.
+     * @return TreeNode
      * @since 5.0.0
      */
     public function offsetGet($offset)
@@ -95,12 +114,12 @@ class Tree implements \IteratorAggregate, \JsonSerializable, \ArrayAccess
      * The value to set.
      * </p>
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @since 5.0.0
      */
     public function offsetSet($offset, $value)
     {
-        throw new \Exception("Use the insert function");
+        throw new Exception("Use the insert function");
     }
 
     /**
@@ -110,23 +129,53 @@ class Tree implements \IteratorAggregate, \JsonSerializable, \ArrayAccess
      * The offset to unset.
      * </p>
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @since 5.0.0
      */
     public function offsetUnset($offset)
     {
-        throw new \Exception("Not implemented");
+        throw new Exception("Not implemented");
     }
 
     /**
      * Specify data which should be serialized to JSON
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     * @return array.
      * @since 5.4.0
      */
     function jsonSerialize()
     {
-        return json_encode($this->toArray());
+        return $this->toArray();
     }
+
+    /**
+     * Count elements of an object
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * </p>
+     * <p>
+     * The return value is cast to an integer.
+     * @since 5.1.0
+     */
+    public function count()
+    {
+        return count($this->nodes);
+    }
+
+    /**
+     * @return TreeNode[]
+     */
+    public function getRoots(): array
+    {
+        return $this->roots;
+    }
+
+    /**
+     * @return TreeNode[]
+     */
+    public function getNodes(): array
+    {
+        return $this->nodes;
+    }
+
 }

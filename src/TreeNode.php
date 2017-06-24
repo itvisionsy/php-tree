@@ -9,24 +9,38 @@
 namespace ItvisionSy\Tree;
 
 
-class TreeNode implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
+use ArrayAccess;
+use ArrayIterator;
+use Countable;
+use Exception;
+use IteratorAggregate;
+use JsonSerializable;
+
+class TreeNode implements ArrayAccess, IteratorAggregate, JsonSerializable, Countable
 {
     /** @var TreeNode[] */
     protected $children = [];
 
+    /** @var scalar */
     protected $id;
 
+    /** @var TreeNode */
+    protected $parent;
+
+    /** @var mixed */
     protected $data;
 
     /**
      * TreeNode constructor.
      * @param $id
      * @param $data
+     * @param TreeNode $parent
      */
-    public function __construct($id, $data)
+    public function __construct($id, $data, TreeNode &$parent = null)
     {
         $this->id = $id;
         $this->data = $data;
+        $this->parent = $parent;
     }
 
     /**
@@ -92,13 +106,13 @@ class TreeNode implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
     /**
      * Retrieve an external iterator
      * @link http://php.net/manual/en/iteratoraggregate.getiterator.php
-     * @return Traversable An instance of an object implementing <b>Iterator</b> or
+     * @return ArrayIterator
      * <b>Traversable</b>
      * @since 5.0.0
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->children);
+        return new ArrayIterator($this->children);
     }
 
     /**
@@ -142,12 +156,12 @@ class TreeNode implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
      * The value to set.
      * </p>
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @since 5.0.0
      */
     public function offsetSet($offset, $value)
     {
-        throw new \Exception("Not allowed. Use addChild method instead");
+        throw new Exception("Not allowed. Use addChild method instead");
     }
 
     /**
@@ -157,12 +171,12 @@ class TreeNode implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
      * The offset to unset.
      * </p>
      * @return void
-     * @throws \Exception
+     * @throws Exception
      * @since 5.0.0
      */
     public function offsetUnset($offset)
     {
-        throw new \Exception("Not implemented");
+        throw new Exception("Not implemented");
     }
 
     /**
@@ -174,6 +188,48 @@ class TreeNode implements \ArrayAccess, \IteratorAggregate, \JsonSerializable
      */
     function jsonSerialize()
     {
-        return json_encode($this->toArray());
+        return $this->toArray();
     }
+
+    /**
+     * Count elements of an object
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     * </p>
+     * <p>
+     * The return value is cast to an integer.
+     * @since 5.1.0
+     */
+    public function count()
+    {
+        return count($this->getChildren());
+    }
+
+    /**
+     * @return TreeNode
+     */
+    public function getParent(): TreeNode
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param TreeNode $parent
+     */
+    public function setParent(TreeNode &$parent)
+    {
+        $this->parent = $parent;
+    }
+
+    public function getPath()
+    {
+        $path = [];
+        $current = $this;
+        while ($current) {
+            $current = $this->getParent();
+            $path[] = $current;
+        }
+        return $path;
+    }
+
 }
